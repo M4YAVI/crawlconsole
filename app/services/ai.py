@@ -29,16 +29,17 @@ async def mode_agent(req: AgentRequest) -> Dict[str, Any]:
     
     try:
         from pydantic_ai import Agent
-        from pydantic_ai.providers.openai import OpenAIProvider
+        from pydantic_ai.models.openai import OpenAIModel
         
-        provider = OpenAIProvider(
+        # Use OpenAIModel directly with custom base_url for OpenRouter
+        model = OpenAIModel(
+            req.model,
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key,
         )
         
         agent = Agent(
-            req.model,
-            provider=provider,
+            model,
             instructions="You are a data extraction agent. Follow the user's instructions precisely."
         )
         
