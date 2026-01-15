@@ -1,57 +1,11 @@
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
+import { $, $$, highlightJson } from './modules/utils.js';
+import { modeOptions } from './modules/config.js';
+import { callApi } from './modules/api.js';
 
 let currentMode = 'scrape';
 let lastResult = null;
 
-// Mode configurations
-const modeOptions = {
-    scrape: [
-        { id: 'format', label: 'Format', type: 'select', options: ['markdown', 'text', 'html'], default: 'markdown' },
-        { id: 'includeLinks', label: 'Include Links', type: 'select', options: ['true', 'false'], default: 'true' },
-        { id: 'includeImages', label: 'Include Images', type: 'select', options: ['true', 'false'], default: 'true' }
-    ],
-    search: [
-        { id: 'query', label: 'Search Query', type: 'text', placeholder: 'main content', default: '' },
-        { id: 'topK', label: 'Top Results', type: 'number', default: '10' }
-    ],
-    agent: [
-        { id: 'instruction', label: 'Instruction', type: 'textarea', placeholder: 'Extract product names and prices', default: '' },
-        { id: 'model', label: 'AI Model', type: 'select', options: ['xiaomi/mimo-v2-flash:free', 'mistralai/devstral-2512:free'], default: 'xiaomi/mimo-v2-flash:free' }
-    ],
-    map: [
-        { id: 'maxDepth', label: 'Max Depth', type: 'number', default: '2' },
-        { id: 'maxPages', label: 'Max Pages', type: 'number', default: '50' },
-        { id: 'sameDomain', label: 'Same Domain', type: 'select', options: ['true', 'false'], default: 'true' }
-    ],
-    crawl: [
-        { id: 'urls', label: 'URLs (one per line)', type: 'textarea', placeholder: 'https://example.com\nhttps://another.com', default: '' },
-        { id: 'batchSize', label: 'Batch Size', type: 'number', default: '3' },
-        { id: 'format', label: 'Format', type: 'select', options: ['markdown', 'text', 'html'], default: 'markdown' }
-    ]
-};
-
-// Mode tabs
-$$('.mode-tab').forEach(tab => {
-    tab.onclick = () => {
-        $$('.mode-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentMode = tab.dataset.mode;
-        renderOptions();
-        $('#optionsPanel').classList.add('visible');
-        $('#urlInput').placeholder = currentMode === 'crawl' ? 'Enter URLs in options below' : 'https://example.com';
-    };
-});
-
-// Output tabs
-$$('.code-tab').forEach(tab => {
-    tab.onclick = () => {
-        $$('.code-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        displayResult(lastResult, tab.dataset.view);
-    };
-});
-
+// Render Options Panel
 function renderOptions() {
     const options = modeOptions[currentMode];
     $('#optionsTitle').textContent = currentMode.charAt(0).toUpperCase() + currentMode.slice(1) + ' Options';
@@ -126,21 +80,6 @@ function buildRequest() {
     }
 }
 
-function highlightJson(obj) {
-    const json = JSON.stringify(obj, null, 2);
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-        let cls = 'json-number';
-        if (/^"/.test(match)) {
-            cls = /:$/.test(match) ? 'json-key' : 'json-string';
-        } else if (/true|false/.test(match)) {
-            cls = 'json-boolean';
-        } else if (/null/.test(match)) {
-            cls = 'json-null';
-        }
-        return '<span class="' + cls + '">' + match + '</span>';
-    });
-}
-
 function displayResult(result, view = 'json') {
     if (!result) return;
 
@@ -157,7 +96,7 @@ function displayResult(result, view = 'json') {
     }
 }
 
-async function submit() {
+async function handleSubmit() {
     const url = $('#urlInput').value.trim();
     if (!url && currentMode !== 'crawl') {
         alert('Please enter a URL');
@@ -176,13 +115,7 @@ async function submit() {
 
     try {
         const request = buildRequest();
-        const res = await fetch(`/api/${currentMode}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(request)
-        });
-
-        const data = await res.json();
+        const data = await callApi(currentMode, request);
         lastResult = data;
 
         if (data.success) {
@@ -206,12 +139,13 @@ async function submit() {
     }
 }
 
-function copyOutput() {
+// Global functions for HTML onclick
+window.copyOutput = () => {
     const text = $('#codeOutput').textContent;
     navigator.clipboard.writeText(text).then(() => alert('Copied!'));
-}
+};
 
-function downloadOutput() {
+window.downloadOutput = () => {
     if (!lastResult) return;
     const blob = new Blob([JSON.stringify(lastResult, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -220,12 +154,32 @@ function downloadOutput() {
     a.download = `crawl-${currentMode}-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-}
+};
 
-// Events
-$('#submitBtn').onclick = submit;
-$('#urlInput').onkeypress = (e) => { if (e.key === 'Enter') submit(); };
+// Event Listeners
+$$('.mode-tab').forEach(tab => {
+    tab.onclick = () => {
+        $$('.mode-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentMode = tab.dataset.mode;
+        renderOptions();
+        $('#optionsPanel').classList.add('visible');
+        $('#urlInput').placeholder = currentMode === 'crawl' ? 'Enter URLs in options below' : 'https://example.com';
+    };
+});
 
-// Init
+$$('.code-tab').forEach(tab => {
+    tab.onclick = () => {
+        $$('.code-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        displayResult(lastResult, tab.dataset.view);
+    };
+});
+
+$('#submitBtn').onclick = handleSubmit;
+$('#urlInput').onkeypress = (e) => { if (e.key === 'Enter') handleSubmit(); };
+
+// Initialization
 renderOptions();
 $('#optionsPanel').classList.add('visible');
+console.log('🚀 CrawlConsole Frontend Initialized');
