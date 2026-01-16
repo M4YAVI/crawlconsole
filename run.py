@@ -15,7 +15,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "app.main:app", 
         host="127.0.0.1", 
-        port=8001, 
-        reload=False,
-        loop="asyncio"  # Explicitly request asyncio loop
+        port=8000, 
+        reload=True,
+        loop="app.loop_setup:new_event_loop"  # Use custom loop factory for Windows support
     )
