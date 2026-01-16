@@ -1,31 +1,41 @@
-from pydantic import BaseModel
-from typing import List, Dict, Optional
+"""
+API Request/Response Models
+"""
+from pydantic import BaseModel, HttpUrl
+from typing import Optional, List
 
 class ScrapeRequest(BaseModel):
+    """Scrape request model"""
     url: str
-    format: str = "markdown"  # markdown, html, text
-    include_links: bool = True
-    include_images: bool = True
-    use_browser: bool = True  # Use Crawl4AI for JS rendering
-
-class SearchRequest(BaseModel):
-    url: str
-    query: str
-    top_k: int = 10
-
-class AgentRequest(BaseModel):
-    url: str
-    instruction: str
-    model: str = "xiaomi/mimo-v2-flash:free"
-    schema: Optional[Dict] = None
-
-class MapRequest(BaseModel):
-    url: str
-    max_depth: int = 2
-    max_pages: int = 50
-    same_domain: bool = True
+    format: str = "markdown"  # "markdown", "text", "html"
+    use_browser: bool = False
+    include_links: bool = False
+    include_images: bool = False
 
 class CrawlRequest(BaseModel):
+    """Crawl request model for batch processing"""
     urls: List[str]
-    batch_size: int = 3
     format: str = "markdown"
+    batch_size: int = 5
+    use_browser: bool = False
+    include_links: bool = False
+    include_images: bool = False
+
+class MapRequest(BaseModel):
+    """Map request model"""
+    url: str
+    max_pages: int = 50
+    max_depth: int = 2
+    same_domain: bool = True
+
+class SearchRequest(BaseModel):
+    """Search request model"""
+    url: str
+    query: str
+    top_k: int = 5
+
+class AgentRequest(BaseModel):
+    """Agent request model"""
+    url: str
+    instruction: str
+    model: Optional[str] = "anthropic/claude-3.5-sonnet"

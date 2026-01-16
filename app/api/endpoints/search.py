@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from ...models.api import SearchRequest
-from ...services.search import mode_search
+from ...features.search.service import mode_search
 
 router = APIRouter()
 

@@ -1,5 +1,5 @@
 import { $, $$, highlightJson } from './modules/utils.js';
-import { modeOptions } from './modules/config.js';
+import { modeOptions } from './modules/config.js?v=2';
 import { callApi } from './modules/api.js';
 
 let currentMode = 'scrape';

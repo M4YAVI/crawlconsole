@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from ...models.api import CrawlRequest
-from ...services.crawl import mode_crawl, mode_crawl_stream
+from ...features.crawl.service import mode_crawl, mode_crawl_stream
 
 router = APIRouter()
 

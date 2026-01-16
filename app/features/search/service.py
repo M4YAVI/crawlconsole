@@ -1,8 +1,11 @@
+"""
+Search Feature Service
+"""
 from bs4 import BeautifulSoup
 from rank_bm25 import BM25Okapi
 from typing import Dict, Any
-from ..models.api import SearchRequest
-from .crawler import scraper
+from ...models.api import SearchRequest
+from ...services.scraper import scraper
 
 async def mode_search(req: SearchRequest) -> Dict[str, Any]:
     """

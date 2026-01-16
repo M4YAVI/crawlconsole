@@ -1,8 +1,12 @@
+"""
+Agent Feature Service
+"""
 import os
 import json
+import traceback
 from typing import Dict, Any, Optional
-from ..models.api import AgentRequest
-from .crawler import scraper
+from ...models.api import AgentRequest
+from ...services.scraper import scraper
 from pydantic_ai import Agent
 from pydantic_ai.models.openrouter import OpenRouterModel, OpenRouterModelSettings
 from pydantic_ai.providers.openrouter import OpenRouterProvider
@@ -141,7 +145,6 @@ Guidelines:
             "error_type": "http_error"
         }
     except Exception as e:
-        import traceback
         return {
             "success": False,
             "mode": "agent",
@@ -173,5 +176,4 @@ def _parse_response(response: str) -> Dict[str, Any]:
         except (ValueError, json.JSONDecodeError):
             pass
     
-    # Return raw response
     return {"raw_response": response}

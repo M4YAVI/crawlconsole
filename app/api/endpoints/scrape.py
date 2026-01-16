@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from ...models.api import ScrapeRequest
-from ...services.scrape import mode_scrape
+from ...services.scraper import scraper
+from ...features.scrape.service import mode_scrape
 
 router = APIRouter()
 

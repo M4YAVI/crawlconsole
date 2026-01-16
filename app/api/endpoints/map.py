@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from ...models.api import MapRequest
-from ...services.map import mode_map
+from ...features.map.service import mode_map
 
 router = APIRouter()
 

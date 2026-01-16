@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from ...models.api import AgentRequest
-from ...services.ai import mode_agent
+from ...features.agent.service import mode_agent
 
 router = APIRouter()
 

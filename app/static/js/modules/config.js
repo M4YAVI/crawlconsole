@@ -1,8 +1,8 @@
 export const modeOptions = {
     scrape: [
         { id: 'format', label: 'Format', type: 'select', options: ['markdown', 'text', 'html'], default: 'markdown' },
-        { id: 'includeLinks', label: 'Include Links', type: 'select', options: ['true', 'false'], default: 'true' },
-        { id: 'includeImages', label: 'Include Images', type: 'select', options: ['true', 'false'], default: 'true' }
+        { id: 'includeLinks', label: 'Include Links', type: 'select', options: ['true', 'false'], default: 'false' },
+        { id: 'includeImages', label: 'Include Images', type: 'select', options: ['true', 'false'], default: 'false' }
     ],
     search: [
         { id: 'query', label: 'Search Query', type: 'text', placeholder: 'main content', default: '' },

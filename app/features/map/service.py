@@ -1,7 +1,10 @@
+"""
+Map Feature Service
+"""
 from urllib.parse import urlparse
 from typing import Dict, Any
-from ..models.api import MapRequest
-from .crawler import scraper
+from ...models.api import MapRequest
+from ...services.scraper import scraper
 
 async def mode_map(req: MapRequest) -> Dict[str, Any]:
     """
@@ -47,8 +50,9 @@ async def mode_map(req: MapRequest) -> Dict[str, Any]:
             
             # Add internal links to queue
             for link in links:
-                if link["internal"] and link["url"] not in visited:
-                    if req.same_domain and urlparse(link["url"]).netloc == base_domain:
+                # Basic check for internal links
+                if urlparse(link["url"]).netloc == base_domain:
+                     if link["url"] not in visited:
                         queue.append((link["url"], depth + 1))
         
         except Exception as e:
