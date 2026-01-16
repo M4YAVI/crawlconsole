@@ -71,7 +71,7 @@ async def mode_scrape(req: ScrapeRequest) -> Dict[str, Any]:
             "mode": "scrape",
             "url": req.url,
             "metadata": metadata,
-            "content": content[:10000],  # Limit content size
+            "content": content,  # No limit
             "format": req.format
         }
         

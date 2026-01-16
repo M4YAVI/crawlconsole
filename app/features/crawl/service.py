@@ -46,7 +46,7 @@ async def mode_crawl(req: CrawlRequest) -> Dict[str, Any]:
                     "url": url,
                     "success": True,
                     "metadata": metadata,
-                    "content": content[:5000]
+                    "content": content
                 }
                 
                 # Optional: Add links/images
@@ -107,7 +107,7 @@ async def mode_crawl_stream(req: CrawlRequest) -> AsyncGenerator[str, None]:
                 else:
                     content = html
                 
-                result = {"url": url, "success": True, "content": content[:3000]}
+                result = {"url": url, "success": True, "content": content}
                 
                 # Optional: Add links/images
                 if req.include_links is True:
